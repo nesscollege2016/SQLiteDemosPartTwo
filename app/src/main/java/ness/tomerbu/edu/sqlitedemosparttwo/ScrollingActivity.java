@@ -21,6 +21,7 @@ public class ScrollingActivity extends AppCompatActivity {
     EditText etID;
     EditText etAlbum;
     private boolean isDataValid;
+    private ContentValues contentValues;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,17 +62,13 @@ public class ScrollingActivity extends AppCompatActivity {
     public void insert(View view) {
         if (!isDataValid())
             return;
-        SongDBHelper helper = new SongDBHelper(this);
-        ContentValues values = new ContentValues();
-        values.put(SongContract.Song.COL_ALBUM, getAlbum());
-        values.put(SongContract.Song.COL_ARTIST, getArtist());
-        values.put(SongContract.Song.COL_DURATION, getDuration());
-        values.put(SongContract.Song.COL_IMAGE, getImage());
-        values.put(SongContract.Song.COL_TITLE, getSongTitle());
+        SQLiteDatabase db = getDB();
+        ContentValues values = getContentValues();
+
         //values.put(SongContract.Song.COL_ID, getID());
 
 
-        long insertedID = helper.getWritableDatabase().insert(
+        long insertedID = db.insert(
                 SongContract.Song.TABLE_NAME,
                 null,
                 values
@@ -93,25 +90,44 @@ public class ScrollingActivity extends AppCompatActivity {
     }
 
     public void delete(View view) {
+        SQLiteDatabase db = getDB();
+
+        int deleteCount = db.delete(SongContract.Song.TABLE_NAME,
+                SongContract.Song.COL_TITLE + " = ?",
+                new String[]{"Hello"}
+        );
+
+        Toast.makeText(ScrollingActivity.this, "" + deleteCount, Toast.LENGTH_SHORT).show();
     }
 
     public void update(View view) {
+        SQLiteDatabase db = getDB();
+        ContentValues values = getContentValues();
+
+        db.update(SongContract.Song.TABLE_NAME,
+                values,
+                "Title = ?", new String[]{"Holla"}
+        );
     }
 
     public void read(View view) {
-        //init helper
-        SongDBHelper helper = new SongDBHelper(this);
-        //get instance to db:
-        SQLiteDatabase db = helper.getWritableDatabase();
+
+        SQLiteDatabase db = getDB();
 
 
         String[] columns = {SongContract.Song.COL_TITLE, SongContract.Song.COL_ARTIST};
-        //
+
+         Cursor cursor = db.query(SongContract.Song.TABLE_NAME,
+                null, null, null, null, null, null);
+
+/*
         /*Cursor cursor = db.query(SongContract.Song.TABLE_NAME,
                 columns, "Title <> ?", new String[]{"Hello"}, null, null, null);*/
 
+/*
         Cursor cursor = db.query(SongContract.Song.TABLE_NAME,
-                columns, null, null, "Title", null, null);
+                columns, null, null, "Title", "COUNT(Title) > 1", "_ID DESC");
+*/
 
         cursor.moveToFirst();
 
@@ -160,5 +176,21 @@ public class ScrollingActivity extends AppCompatActivity {
         if (!isDataValid)
             etSongName.setError("Must be at least 2 characters");
         return isDataValid;
+    }
+
+    public SQLiteDatabase getDB() {
+        SongDBHelper helper = new SongDBHelper(this);
+        SQLiteDatabase db = helper.getWritableDatabase();
+        return db;
+    }
+
+    public ContentValues getContentValues() {
+        ContentValues values = new ContentValues();
+        values.put(SongContract.Song.COL_ALBUM, getAlbum());
+        values.put(SongContract.Song.COL_ARTIST, getArtist());
+        values.put(SongContract.Song.COL_DURATION, getDuration());
+        values.put(SongContract.Song.COL_IMAGE, getImage());
+        values.put(SongContract.Song.COL_TITLE, getSongTitle());
+        return values;
     }
 }
