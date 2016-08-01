@@ -1,7 +1,6 @@
 package ness.tomerbu.edu.sqlitedemosparttwo;
 
 import android.content.ContentValues;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +10,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+
+import ness.tomerbu.edu.sqlitedemosparttwo.db.SongContract;
+import ness.tomerbu.edu.sqlitedemosparttwo.db.SongDAO;
+import ness.tomerbu.edu.sqlitedemosparttwo.db.SongDBHelper;
+import ness.tomerbu.edu.sqlitedemosparttwo.models.Song;
 
 public class ScrollingActivity extends AppCompatActivity {
 
@@ -62,22 +68,15 @@ public class ScrollingActivity extends AppCompatActivity {
     public void insert(View view) {
         if (!isDataValid())
             return;
-        SQLiteDatabase db = getDB();
-        ContentValues values = getContentValues();
 
-        //values.put(SongContract.Song.COL_ID, getID());
+        SongDAO dao = new SongDAO(this);
+        Song song = getSong();
 
-
-        long insertedID = db.insert(
-                SongContract.Song.TABLE_NAME,
-                null,
-                values
-        );
+        long insertedID = dao.insert(song);
 
         Toast.makeText(ScrollingActivity.this, "" + insertedID,
                 Toast.LENGTH_SHORT).show();
         clearEditTexts();
-
     }
 
     private void clearEditTexts() {
@@ -90,60 +89,26 @@ public class ScrollingActivity extends AppCompatActivity {
     }
 
     public void delete(View view) {
-        SQLiteDatabase db = getDB();
-
-        int deleteCount = db.delete(SongContract.Song.TABLE_NAME,
-                SongContract.Song.COL_TITLE + " = ?",
-                new String[]{"Hello"}
-        );
+        SongDAO dao = new SongDAO(this);
+        int deleteCount =  dao.delete(getID());
 
         Toast.makeText(ScrollingActivity.this, "" + deleteCount, Toast.LENGTH_SHORT).show();
     }
 
     public void update(View view) {
-        SQLiteDatabase db = getDB();
-        ContentValues values = getContentValues();
 
-        db.update(SongContract.Song.TABLE_NAME,
-                values,
-                "Title = ?", new String[]{"Holla"}
-        );
+        SongDAO dao = new SongDAO(this);
+        int updateCount = dao.update(getSong().getContentValues(), getID());
+        Toast.makeText(ScrollingActivity.this, updateCount, Toast.LENGTH_SHORT).show();
+
     }
 
     public void read(View view) {
-
-        SQLiteDatabase db = getDB();
-
-
-        String[] columns = {SongContract.Song.COL_TITLE, SongContract.Song.COL_ARTIST};
-
-         Cursor cursor = db.query(SongContract.Song.TABLE_NAME,
-                null, null, null, null, null, null);
-
-/*
-        /*Cursor cursor = db.query(SongContract.Song.TABLE_NAME,
-                columns, "Title <> ?", new String[]{"Hello"}, null, null, null);*/
-
-/*
-        Cursor cursor = db.query(SongContract.Song.TABLE_NAME,
-                columns, null, null, "Title", "COUNT(Title) > 1", "_ID DESC");
-*/
-
-        cursor.moveToFirst();
-
-        do{
-          //  int id = cursor.getInt(cursor.getColumnIndex(SongContract.Song.COL_ID));
-           // String album = cursor.getString(cursor.getColumnIndex(SongContract.Song.COL_ALBUM));
-            String title = cursor.getString(cursor.getColumnIndex(SongContract.Song.COL_TITLE));
-            String artist = cursor.getString(cursor.getColumnIndex(SongContract.Song.COL_ARTIST));
-           // String image = cursor.getString(cursor.getColumnIndex(SongContract.Song.COL_IMAGE));
-          //  String duration = cursor.getString(cursor.getColumnIndex(SongContract.Song.COL_DURATION));
-           // String text = String.format("Title: %s \nAlbum: %s\nArtist: %s\nImage: %s Duration: %s", title, album, artist, image, duration);
-
-            Toast.makeText(ScrollingActivity.this, String.format("%s %s", title, artist), Toast.LENGTH_SHORT).show();
+        SongDAO dao = new SongDAO(this);
+        ArrayList<Song> read = dao.read();
+        for (Song s : read) {
+            Toast.makeText(ScrollingActivity.this, s.toString(), Toast.LENGTH_SHORT).show();
         }
-        while (cursor.moveToNext());
-
     }
 
     public String getAlbum() {
@@ -167,8 +132,13 @@ public class ScrollingActivity extends AppCompatActivity {
         return etSongName.getText().toString();
     }
 
-    public String getID() {
-        return etID.getText().toString();
+    public Integer getID() {
+        try {
+            return Integer.valueOf(etID.getText().toString());
+        }
+        catch (Exception e){
+            return 0;
+        }
     }
 
     public boolean isDataValid() {
@@ -192,5 +162,17 @@ public class ScrollingActivity extends AppCompatActivity {
         values.put(SongContract.Song.COL_IMAGE, getImage());
         values.put(SongContract.Song.COL_TITLE, getSongTitle());
         return values;
+    }
+
+    public Song getSong() {
+        Song song = new Song(getAlbum(),
+                getArtist(),
+                getDuration(),
+                getID(),
+                getImage(),
+                getSongTitle()
+        );
+
+        return song;
     }
 }

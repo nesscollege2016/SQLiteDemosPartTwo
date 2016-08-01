@@ -1,4 +1,4 @@
-package ness.tomerbu.edu.sqlitedemosparttwo;
+package ness.tomerbu.edu.sqlitedemosparttwo.db;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

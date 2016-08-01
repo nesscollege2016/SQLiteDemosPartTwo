@@ -1,4 +1,4 @@
-package ness.tomerbu.edu.sqlitedemosparttwo;
+package ness.tomerbu.edu.sqlitedemosparttwo.db;
 
 /**
  * Created by android on 01/08/2016.
