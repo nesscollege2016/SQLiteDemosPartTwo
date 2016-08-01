@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class ScrollingActivity extends AppCompatActivity {
 
@@ -17,6 +18,7 @@ public class ScrollingActivity extends AppCompatActivity {
     EditText etDuration;
     EditText etID;
     EditText etAlbum;
+    private boolean isDataValid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +57,8 @@ public class ScrollingActivity extends AppCompatActivity {
     }
 
     public void insert(View view) {
+        if (!isDataValid())
+            return;
         SongDBHelper helper = new SongDBHelper(this);
         ContentValues values = new ContentValues();
         values.put(SongContract.Song.COL_ALBUM, getAlbum());
@@ -65,13 +69,25 @@ public class ScrollingActivity extends AppCompatActivity {
         //values.put(SongContract.Song.COL_ID, getID());
 
 
-
-        helper.getWritableDatabase().insert(
+        long insertedID = helper.getWritableDatabase().insert(
                 SongContract.Song.TABLE_NAME,
                 null,
                 values
         );
 
+        Toast.makeText(ScrollingActivity.this, "" + insertedID,
+                Toast.LENGTH_SHORT).show();
+        clearEditTexts();
+
+    }
+
+    private void clearEditTexts() {
+        etID.setText("");
+        etSongName.setText("");
+        etImage.setText("");
+        etDuration.setText("");
+        etArtist.setText("");
+        etAlbum.setText("");
     }
 
     public void delete(View view) {
@@ -106,5 +122,12 @@ public class ScrollingActivity extends AppCompatActivity {
 
     public String getID() {
         return etID.getText().toString();
+    }
+
+    public boolean isDataValid() {
+        boolean isDataValid = getSongTitle().length() >= 2;
+        if (!isDataValid)
+            etSongName.setError("Must be at least 2 characters");
+        return isDataValid;
     }
 }
