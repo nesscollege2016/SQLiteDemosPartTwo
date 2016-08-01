@@ -1,6 +1,8 @@
 package ness.tomerbu.edu.sqlitedemosparttwo;
 
 import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -97,6 +99,35 @@ public class ScrollingActivity extends AppCompatActivity {
     }
 
     public void read(View view) {
+        //init helper
+        SongDBHelper helper = new SongDBHelper(this);
+        //get instance to db:
+        SQLiteDatabase db = helper.getWritableDatabase();
+
+
+        String[] columns = {SongContract.Song.COL_TITLE, SongContract.Song.COL_ARTIST};
+        //
+        /*Cursor cursor = db.query(SongContract.Song.TABLE_NAME,
+                columns, "Title <> ?", new String[]{"Hello"}, null, null, null);*/
+
+        Cursor cursor = db.query(SongContract.Song.TABLE_NAME,
+                columns, null, null, "Title", null, null);
+
+        cursor.moveToFirst();
+
+        do{
+          //  int id = cursor.getInt(cursor.getColumnIndex(SongContract.Song.COL_ID));
+           // String album = cursor.getString(cursor.getColumnIndex(SongContract.Song.COL_ALBUM));
+            String title = cursor.getString(cursor.getColumnIndex(SongContract.Song.COL_TITLE));
+            String artist = cursor.getString(cursor.getColumnIndex(SongContract.Song.COL_ARTIST));
+           // String image = cursor.getString(cursor.getColumnIndex(SongContract.Song.COL_IMAGE));
+          //  String duration = cursor.getString(cursor.getColumnIndex(SongContract.Song.COL_DURATION));
+           // String text = String.format("Title: %s \nAlbum: %s\nArtist: %s\nImage: %s Duration: %s", title, album, artist, image, duration);
+
+            Toast.makeText(ScrollingActivity.this, String.format("%s %s", title, artist), Toast.LENGTH_SHORT).show();
+        }
+        while (cursor.moveToNext());
+
     }
 
     public String getAlbum() {
