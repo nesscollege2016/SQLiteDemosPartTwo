@@ -2,9 +2,15 @@ package ness.tomerbu.edu.sqlitedemosparttwo;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+
+import ness.tomerbu.edu.sqlitedemosparttwo.adapters.SongRecyclerAdapter;
+import ness.tomerbu.edu.sqlitedemosparttwo.db.SongDAO;
 
 public class ScrollingActivity extends AppCompatActivity {
 
@@ -14,6 +20,11 @@ public class ScrollingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_scrolling);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        RecyclerView rvSongs = (RecyclerView) findViewById(R.id.songRecycler);
+        SongRecyclerAdapter adapter = new SongRecyclerAdapter(this);
+        rvSongs.setLayoutManager(new LinearLayoutManager(this));
+        rvSongs.setAdapter(adapter);
 
 
     }
@@ -39,4 +50,7 @@ public class ScrollingActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void addSong(View view) {
+
+    }
 }
