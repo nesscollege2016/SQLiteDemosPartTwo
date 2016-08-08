@@ -5,14 +5,21 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import ness.tomerbu.edu.sqlitedemosparttwo.adapters.SongRecyclerAdapter;
-import ness.tomerbu.edu.sqlitedemosparttwo.db.SongDAO;
+import ness.tomerbu.edu.sqlitedemosparttwo.fragments.AddItemFragment;
+import ness.tomerbu.edu.sqlitedemosparttwo.models.Song;
 
 public class ScrollingActivity extends AppCompatActivity {
+
+    private SongRecyclerAdapter adapter;
+    private RecyclerView rvSongs;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,12 +28,27 @@ public class ScrollingActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        RecyclerView rvSongs = (RecyclerView) findViewById(R.id.songRecycler);
-        SongRecyclerAdapter adapter = new SongRecyclerAdapter(this);
+        rvSongs = (RecyclerView) findViewById(R.id.songRecycler);
+        adapter = new SongRecyclerAdapter(this, getSupportFragmentManager());
         rvSongs.setLayoutManager(new LinearLayoutManager(this));
         rvSongs.setAdapter(adapter);
 
 
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.LEFT|ItemTouchHelper.RIGHT, ItemTouchHelper.LEFT|ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                adapter.remove(position);
+                adapter.notifyItemRemoved(position);
+            }
+        });
+
+        itemTouchHelper.attachToRecyclerView(rvSongs);
     }
 
     @Override
@@ -51,6 +73,21 @@ public class ScrollingActivity extends AppCompatActivity {
     }
 
     public void addSong(View view) {
+        AddItemFragment fragment = new AddItemFragment();
+
+        fragment.setListener(new AddItemFragment.OnSongAddedListener() {
+            @Override
+            public void onSongAdded(Song s) {
+                adapter.addItem(s, rvSongs);
+
+            }
+
+            @Override
+            public void onSongChanged(Song s) {
+                //
+            }
+        });
+        fragment.show(getSupportFragmentManager(), "Dialog");
 
     }
 }

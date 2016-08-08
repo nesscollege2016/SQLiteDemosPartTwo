@@ -24,6 +24,14 @@ public class Song {
         this.title = title;
     }
 
+    public Song(String album, String artist, String duration, String image, String title) {
+        this.album = album;
+        this.artist = artist;
+        this.duration = duration;
+        this.image = image;
+        this.title = title;
+    }
+
     @Override
     public String toString() {
         return "Song{" +

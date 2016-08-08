@@ -1,0 +1,66 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="20dp"
+    tools:context="ness.tomerbu.edu.sqlitedemosparttwo.fragments.AddItemFragment">
+
+
+
+    <EditText
+        android:hint="Title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/etTitle"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <EditText
+        android:hint="Artist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/etArtist"
+        android:layout_below="@+id/etTitle"
+        android:layout_centerHorizontal="true" />
+
+    <EditText
+        android:hint="Duration"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/etDuration"
+        android:layout_below="@+id/etArtist"
+        android:layout_centerHorizontal="true" />
+
+    <EditText
+        android:hint="Album"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/etAlbum"
+        android:layout_below="@+id/etDuration"
+        android:layout_centerHorizontal="true" />
+
+    <EditText
+        android:hint="Image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/etImage"
+        android:layout_below="@+id/etAlbum"
+        android:layout_centerHorizontal="true" />
+
+    <EditText
+        android:hint="ID"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/etID"
+        android:layout_below="@+id/etImage"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        android:id="@+id/btnSave"
+        android:layout_below="@+id/etID"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+</RelativeLayout>
