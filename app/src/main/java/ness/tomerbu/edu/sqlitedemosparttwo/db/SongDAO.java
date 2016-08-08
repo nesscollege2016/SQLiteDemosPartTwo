@@ -10,15 +10,28 @@ import java.util.ArrayList;
 import ness.tomerbu.edu.sqlitedemosparttwo.models.Song;
 
 /**
- * Created by android on 01/08/2016.
+ *
+ * 1) private constructor-- available to the class only:
+ * 2) define a sharedInstance as a field *(Same type as the class)
+ * 3) define a static method: getInstance: init the sharedInstance if needed and returns the same shared instance
  */
 public class SongDAO {
-    public SongDAO(Context context) {
+
+    private SongDAO(Context context) {
         this.context = context;
     }
 
     private Context context;
+    private static SongDAO sharedInstance = null;
 
+
+    //Singleton: define a single instance for the class:
+    public static SongDAO getInstance(Context context){
+        if (sharedInstance==null){
+            sharedInstance = new SongDAO(context);
+        }
+        return sharedInstance;
+    }
 
 
     public long insert(ContentValues values) {
@@ -29,24 +42,21 @@ public class SongDAO {
                 null,
                 values
         );
-
         return insertedID;
-
     }
 
 
     public long insert(Song song) {
 
-        ContentValues values = song.getContentValues();
-        SQLiteDatabase db = getDB();
+        ContentValues values = new ContentValues();
+        values.put(SongContract.Song.COL_ALBUM, song.getAlbum());
+        values.put(SongContract.Song.COL_ARTIST, song.getArtist());
+        values.put(SongContract.Song.COL_DURATION, song.getDuration());
+        values.put(SongContract.Song.COL_TITLE, song.getTitle());
+        values.put(SongContract.Song.COL_IMAGE, song.getImage());
 
-        long insertedID = db.insert(
-                SongContract.Song.TABLE_NAME,
-                null,
-                values
-        );
 
-        return insertedID;
+       return insert(values);
 
     }
 
@@ -72,21 +82,28 @@ public class SongDAO {
     public int delete(int id) {
         SQLiteDatabase db = getDB();
 
-        int deleteCount = db.delete(SongContract.Song.TABLE_NAME,
-                SongContract.Song.COL_ID + " = ?",
-                new String[]{"" + id}
+        int deleteCount = db.delete(
+                SongContract.Song.TABLE_NAME,
+                " _ID = ? ",
+                new String[]{id + ""}
         );
         return deleteCount;
+    }
 
-     }
 
-    public ArrayList<Song> read() {
-
+    public int delete(String songTitle) {
         SQLiteDatabase db = getDB();
 
-        Cursor cursor = db.query(SongContract.Song.TABLE_NAME,
-                null, null, null, null, null, null);
+        int deleteCount = db.delete(SongContract.Song.TABLE_NAME,
+                SongContract.Song.COL_TITLE + " = ? ",
+                new String[]{songTitle + ""});
+        return deleteCount;
 
+    }
+
+    public ArrayList<Song> read() {
+        SQLiteDatabase db = getDB();
+        Cursor cursor = db.query(SongContract.Song.TABLE_NAME, null, null, null, null, null, null);
         return getSongs(cursor);
 
     }
@@ -94,19 +111,19 @@ public class SongDAO {
     public static ArrayList<Song> getSongs(Cursor cursor){
 
         ArrayList<Song> songs = new ArrayList<>();
-        cursor.moveToFirst();
 
-        do{
-            int id = cursor.getInt(cursor.getColumnIndex(SongContract.Song.COL_ID));
-            String album = cursor.getString(cursor.getColumnIndex(SongContract.Song.COL_ALBUM));
-            String title = cursor.getString(cursor.getColumnIndex(SongContract.Song.COL_TITLE));
-            String artist = cursor.getString(cursor.getColumnIndex(SongContract.Song.COL_ARTIST));
-            String image = cursor.getString(cursor.getColumnIndex(SongContract.Song.COL_IMAGE));
-            String duration = cursor.getString(cursor.getColumnIndex(SongContract.Song.COL_DURATION));
-            Song s = new Song(album, artist, duration, id, image, title);
-            songs.add(s);
+        if (cursor.moveToFirst()){
+            do {
+                String title = cursor.getString(cursor.getColumnIndex(SongContract.Song.COL_TITLE));
+                String artist = cursor.getString(cursor.getColumnIndex(SongContract.Song.COL_ARTIST));
+                String album = cursor.getString(cursor.getColumnIndex(SongContract.Song.COL_ALBUM));
+                String duration = cursor.getString(cursor.getColumnIndex(SongContract.Song.COL_DURATION));
+                String image = cursor.getString(cursor.getColumnIndex(SongContract.Song.COL_IMAGE));
+                Integer id = cursor.getInt(cursor.getColumnIndex(SongContract.Song.COL_ID));
+                Song s = new Song(album, artist, duration, id, image, title);
+                songs.add(s);
+            }while (cursor.moveToNext());
         }
-        while (cursor.moveToNext());
 
         return songs;
     }

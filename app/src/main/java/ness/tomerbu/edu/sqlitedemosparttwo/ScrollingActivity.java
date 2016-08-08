@@ -1,33 +1,12 @@
 package ness.tomerbu.edu.sqlitedemosparttwo;
 
-import android.content.ContentValues;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.Toast;
-
-import java.util.ArrayList;
-
-import ness.tomerbu.edu.sqlitedemosparttwo.db.SongContract;
-import ness.tomerbu.edu.sqlitedemosparttwo.db.SongDAO;
-import ness.tomerbu.edu.sqlitedemosparttwo.db.SongDBHelper;
-import ness.tomerbu.edu.sqlitedemosparttwo.models.Song;
 
 public class ScrollingActivity extends AppCompatActivity {
-
-    EditText etSongName;
-    EditText etArtist;
-    EditText etImage;
-    EditText etDuration;
-    EditText etID;
-    EditText etAlbum;
-    private boolean isDataValid;
-    private ContentValues contentValues;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,12 +15,7 @@ public class ScrollingActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        etSongName = (EditText) findViewById(R.id.etTitle);
-        etArtist = (EditText) findViewById(R.id.etArtist);
-        etImage = (EditText) findViewById(R.id.etImage);
-        etDuration = (EditText) findViewById(R.id.etDuration);
-        etID = (EditText) findViewById(R.id.etID);
-        etAlbum = (EditText) findViewById(R.id.etAlbum);
+
     }
 
     @Override
@@ -65,114 +39,4 @@ public class ScrollingActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void insert(View view) {
-        if (!isDataValid())
-            return;
-
-        SongDAO dao = new SongDAO(this);
-        Song song = getSong();
-
-        long insertedID = dao.insert(song);
-
-        Toast.makeText(ScrollingActivity.this, "" + insertedID,
-                Toast.LENGTH_SHORT).show();
-        clearEditTexts();
-    }
-
-    private void clearEditTexts() {
-        etID.setText("");
-        etSongName.setText("");
-        etImage.setText("");
-        etDuration.setText("");
-        etArtist.setText("");
-        etAlbum.setText("");
-    }
-
-    public void delete(View view) {
-        SongDAO dao = new SongDAO(this);
-        int deleteCount =  dao.delete(getID());
-
-        Toast.makeText(ScrollingActivity.this, "" + deleteCount, Toast.LENGTH_SHORT).show();
-    }
-
-    public void update(View view) {
-
-        SongDAO dao = new SongDAO(this);
-        int updateCount = dao.update(getSong().getContentValues(), getID());
-        Toast.makeText(ScrollingActivity.this, updateCount, Toast.LENGTH_SHORT).show();
-
-    }
-
-    public void read(View view) {
-        SongDAO dao = new SongDAO(this);
-        ArrayList<Song> read = dao.read();
-        for (Song s : read) {
-            Toast.makeText(ScrollingActivity.this, s.toString(), Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public String getAlbum() {
-        return etAlbum.getText().toString();
-    }
-
-    public String getArtist() {
-        return etArtist.getText().toString();
-    }
-
-    public String getDuration() {
-        return etDuration.getText().toString();
-    }
-
-    public String getImage() {
-        return etImage.getText().toString();
-    }
-
-
-    public String getSongTitle() {
-        return etSongName.getText().toString();
-    }
-
-    public Integer getID() {
-        try {
-            return Integer.valueOf(etID.getText().toString());
-        }
-        catch (Exception e){
-            return 0;
-        }
-    }
-
-    public boolean isDataValid() {
-        boolean isDataValid = getSongTitle().length() >= 2;
-        if (!isDataValid)
-            etSongName.setError("Must be at least 2 characters");
-        return isDataValid;
-    }
-
-    public SQLiteDatabase getDB() {
-        SongDBHelper helper = new SongDBHelper(this);
-        SQLiteDatabase db = helper.getWritableDatabase();
-        return db;
-    }
-
-    public ContentValues getContentValues() {
-        ContentValues values = new ContentValues();
-        values.put(SongContract.Song.COL_ALBUM, getAlbum());
-        values.put(SongContract.Song.COL_ARTIST, getArtist());
-        values.put(SongContract.Song.COL_DURATION, getDuration());
-        values.put(SongContract.Song.COL_IMAGE, getImage());
-        values.put(SongContract.Song.COL_TITLE, getSongTitle());
-        return values;
-    }
-
-    public Song getSong() {
-        Song song = new Song(getAlbum(),
-                getArtist(),
-                getDuration(),
-                getID(),
-                getImage(),
-                getSongTitle()
-        );
-
-        return song;
-    }
 }
